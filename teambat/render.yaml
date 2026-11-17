@@ -1,0 +1,19 @@
+# Blueprint para o Render (https://render.com): cria o serviço web com disco persistente.
+services:
+  - type: web
+    name: teambat
+    runtime: docker
+    rootDir: teambat
+    plan: starter
+    healthCheckPath: /api/state
+    disk:
+      name: teambat-data
+      mountPath: /data
+      sizeGB: 1
+    envVars:
+      - key: DATA_DIR
+        value: /data
+      - key: COOKIE_SECURE
+        value: "1"
+      - key: SETUP_TOKEN
+        generateValue: true

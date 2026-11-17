@@ -1,0 +1,12 @@
+{
+  "name": "teambat",
+  "version": "1.0.0",
+  "private": true,
+  "description": "TeamBat — plataforma de acompanhamento de treinamento (Science Based Lifting)",
+  "main": "server.js",
+  "engines": { "node": ">=22.13" },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/api.test.js"
+  }
+}
