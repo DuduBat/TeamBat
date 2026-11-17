@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>DuduBat | Portfólio de Edição de Vídeos</title>
+  <meta name="description" content="Portfólio de DuduBat, editor de vídeos e criador visual. Edits, vlogs e conteúdos para redes sociais com ritmo, criatividade e identidade própria.">
+  <meta name="theme-color" content="#050505">
+  <meta name="color-scheme" content="dark">
+
+  <!-- Compartilhamento social -->
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:site_name" content="DuduBat">
+  <meta property="og:title" content="DuduBat | Portfólio de Edição de Vídeos">
+  <meta property="og:description" content="Transformando ideias em experiências visuais. Conheça os trabalhos de DuduBat, editor de vídeos.">
+  <meta property="og:image" content="assets/img/og.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="DuduBat | Portfólio de Edição de Vídeos">
+  <meta name="twitter:description" content="Transformando ideias em experiências visuais.">
+  <meta name="twitter:image" content="assets/img/og.png">
+
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="icon" href="assets/img/favicon-32.png" sizes="32x32" type="image/png">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+
+  <link rel="preload" href="assets/fonts/unbounded.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="assets/fonts/manrope.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/style.css">
+  <script>document.documentElement.classList.add('js');</script>
+</head>
+<body>
+
+  <!-- Símbolos SVG reutilizados em todo o site -->
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="bat-grad" x1="0" y1="0" x2="1" y2="1">
+        <stop offset="0" stop-color="#C084FC"/>
+        <stop offset=".55" stop-color="#A855F7"/>
+        <stop offset="1" stop-color="#7928CA"/>
+      </linearGradient>
+      <symbol id="bat" viewBox="0 0 120 64">
+        <path fill-rule="evenodd" d="M60 19.5 62.5 18 65.5 11 70 21 87 5 118 13 103 35 94 26 83 43 74 32 60 59 46 32 37 43 26 26 17 35 2 13 33 5 50 21 54.5 11 57.5 18ZM56.5 28 56.5 41 67 34.5Z"/>
+      </symbol>
+      <symbol id="bat-solid" viewBox="0 0 120 64">
+        <path d="M60 19.5 62.5 18 65.5 11 70 21 87 5 118 13 103 35 94 26 83 43 74 32 60 59 46 32 37 43 26 26 17 35 2 13 33 5 50 21 54.5 11 57.5 18Z"/>
+      </symbol>
+      <symbol id="bat-outline" viewBox="0 0 120 64">
+        <path fill="none" stroke="currentColor" stroke-width=".5" stroke-linejoin="round" d="M60 19.5 62.5 18 65.5 11 70 21 87 5 118 13 103 35 94 26 83 43 74 32 60 59 46 32 37 43 26 26 17 35 2 13 33 5 50 21 54.5 11 57.5 18Z"/>
+      </symbol>
+      <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l11-6.5z"/></symbol>
+      <symbol id="i-arrow" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M13 6l6 6-6 6"/></symbol>
+      <symbol id="i-close" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></symbol>
+      <symbol id="i-chev" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" d="m9 5 7 7-7 7"/></symbol>
+      <symbol id="i-whatsapp" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" d="M4 20l1.3-4.2A8 8 0 1 1 8.3 19zM9.2 8.6c-.5 2.8 3.2 6.5 6.2 6.2l.9-1.6-2-1.1-.9.8c-.9-.3-2-1.4-2.3-2.3l.8-.9-1.1-2z"/></symbol>
+      <symbol id="i-instagram" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.6"/></g><circle cx="16.7" cy="7.3" r="1.1"/></symbol>
+      <symbol id="i-email" viewBox="0 0 24 24"><g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5.5" width="17" height="13" rx="2"/><path d="m4 7 8 6 8-6"/></g></symbol>
+    </defs>
+  </svg>
+
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
+
+  <!-- ============ TELA DE CARREGAMENTO ============ -->
+  <div class="loader" id="loader" role="status" aria-label="Carregando DuduBat">
+    <div class="loader__inner">
+      <svg class="loader__bat" viewBox="0 0 120 64" aria-hidden="true">
+        <path class="loader__fill" fill="url(#bat-grad)" fill-rule="evenodd" d="M60 19.5 62.5 18 65.5 11 70 21 87 5 118 13 103 35 94 26 83 43 74 32 60 59 46 32 37 43 26 26 17 35 2 13 33 5 50 21 54.5 11 57.5 18ZM56.5 28 56.5 41 67 34.5Z"/>
+        <path class="loader__stroke" pathLength="1" fill="none" stroke="#C084FC" stroke-width=".9" stroke-linejoin="round" d="M60 19.5 62.5 18 65.5 11 70 21 87 5 118 13 103 35 94 26 83 43 74 32 60 59 46 32 37 43 26 26 17 35 2 13 33 5 50 21 54.5 11 57.5 18Z"/>
+      </svg>
+      <div class="loader__name" aria-hidden="true">DUDU<span>BAT</span></div>
+      <div class="loader__bar"><i></i></div>
+    </div>
+  </div>
+
+  <div class="scroll-progress" aria-hidden="true"><i id="scroll-progress"></i></div>
+
+  <!-- ============ CABEÇALHO ============ -->
+  <header class="header" id="header">
+    <div class="container header__row">
+      <a class="brand" href="#inicio" aria-label="DuduBat — início">
+        <svg class="brand__bat" aria-hidden="true"><use href="#bat"/></svg>
+        <span class="brand__name">DUDU<span>BAT</span></span>
+      </a>
+
+      <nav class="nav" id="nav" aria-label="Navegação principal">
+        <ul class="nav__list">
+          <li><a href="#inicio" data-nav>Início</a></li>
+          <li><a href="#portfolio" data-nav>Portfólio</a></li>
+          <li><a href="#sobre" data-nav>Sobre mim</a></li>
+          <li><a href="#servicos" data-nav>Serviços</a></li>
+          <li><a href="#contato" data-nav>Contato</a></li>
+        </ul>
+        <a class="btn btn--primary nav__cta" href="#contato">Vamos trabalhar juntos</a>
+      </nav>
+
+      <a class="btn btn--primary btn--sm header__cta" href="#contato">Vamos trabalhar juntos</a>
+
+      <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="nav" aria-label="Abrir menu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main id="conteudo">
+
+    <!-- ============ HERO ============ -->
+    <section class="hero" id="inicio" aria-labelledby="hero-title">
+      <canvas class="hero__particles" id="particles" aria-hidden="true"></canvas>
+      <div class="hero__glow hero__glow--a" aria-hidden="true"></div>
+      <div class="hero__glow hero__glow--b" aria-hidden="true"></div>
+      <div class="hero__bat" data-depth="18" aria-hidden="true">
+        <svg class="hero__bat-fill"><use href="#bat-solid"/></svg>
+        <svg class="hero__bat-line"><use href="#bat-outline"/></svg>
+      </div>
+      <div class="hero__frame" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+
+      <div class="container hero__content" data-depth="-6">
+        <p class="eyebrow hero__in" style="--d:0"><span class="rec"></span>VIDEO EDITOR • CREATIVE PORTFOLIO</p>
+        <h1 class="hero__title hero__in" id="hero-title" style="--d:1">DUDU<span class="hero__title-bat">BAT</span></h1>
+        <p class="hero__tagline hero__in" style="--d:2">Transformando ideias em experiências visuais.</p>
+        <p class="hero__desc hero__in" style="--d:3">Vídeos não são apenas imagens em movimento. São histórias, emoções e experiências. Meu trabalho é transformar ideias em conteúdos visuais que prendem a atenção e deixam sua marca.</p>
+        <div class="hero__actions hero__in" style="--d:4">
+          <a class="btn btn--primary" href="#portfolio">
+            <svg aria-hidden="true"><use href="#i-play"/></svg>Explorar portfólio
+          </a>
+          <a class="btn btn--ghost" href="#contato">Entrar em contato</a>
+        </div>
+      </div>
+
+      <div class="container hero__bottom hero__in" style="--d:5">
+        <span class="mono hero__tc" aria-hidden="true">TC <b id="timecode">00:00:00:00</b></span>
+        <a class="scroll-cue" href="#apresentacao" aria-label="Rolar para a próxima seção">
+          <span class="scroll-cue__line"><i></i></span>
+          <span class="mono">ROLE</span>
+        </a>
+        <span class="mono hero__fmt" aria-hidden="true">DARK • CINEMATIC • 24 FPS</span>
+      </div>
+    </section>
+
+    <!-- ============ O QUE EU FAÇO ============ -->
+    <section class="section intro" id="apresentacao" aria-labelledby="intro-title">
+      <div class="container intro__grid">
+        <div class="intro__text" data-reveal>
+          <p class="eyebrow"><span class="mono">01</span>O que eu faço</p>
+          <h2 class="title" id="intro-title">CRIATIVIDADE EM <em>CADA FRAME.</em></h2>
+          <p class="lead">Cada projeto é uma oportunidade de criar algo único. Busco transformar materiais brutos em vídeos dinâmicos, envolventes e visualmente bem construídos, sempre valorizando a identidade e o objetivo de cada conteúdo.</p>
+          <a class="link-arrow" href="#portfolio">Ver os trabalhos <svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+
+        <!-- Painel decorativo inspirado em softwares de edição -->
+        <div class="editor" data-reveal aria-hidden="true">
+          <div class="editor__bar">
+            <span class="editor__dots"><i></i><i></i><i></i></span>
+            <span class="mono">dudubat_edit_v1.prj</span>
+            <span class="mono editor__tc">00:00:12:08</span>
+          </div>
+          <div class="editor__monitor">
+            <svg class="editor__monitor-bat"><use href="#bat"/></svg>
+            <span class="editor__safe"></span>
+            <span class="mono editor__label">PREVIEW</span>
+          </div>
+          <div class="editor__timeline">
+            <div class="editor__ruler"></div>
+            <div class="track"><span class="mono track__name">V2</span><div class="track__lane">
+              <i class="clip clip--title" style="--x:8%;--w:18%"></i>
+              <i class="clip clip--title" style="--x:54%;--w:14%"></i>
+            </div></div>
+            <div class="track"><span class="mono track__name">V1</span><div class="track__lane">
+              <i class="clip" style="--x:0%;--w:22%"></i>
+              <i class="clip clip--alt" style="--x:22.6%;--w:15%"></i>
+              <i class="clip" style="--x:38.2%;--w:26%"></i>
+              <i class="clip clip--alt" style="--x:64.8%;--w:12%"></i>
+              <i class="clip" style="--x:77.4%;--w:22.6%"></i>
+            </div></div>
+            <div class="track"><span class="mono track__name">A1</span><div class="track__lane track__lane--audio" id="waveform"></div></div>
+            <div class="editor__playhead"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PORTFÓLIO ============ -->
+    <section class="section portfolio" id="portfolio" aria-labelledby="portfolio-title">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <div>
+            <p class="eyebrow"><span class="mono">02</span>Portfólio</p>
+            <h2 class="title" id="portfolio-title">TRABALHOS <em>EM DESTAQUE.</em></h2>
+          </div>
+          <div class="filters" id="filters" role="group" aria-label="Filtrar trabalhos"></div>
+        </div>
+
+        <!-- Os cards são gerados a partir de js/config.js -->
+        <ul class="gallery" id="gallery"></ul>
+        <noscript><p class="lead">Ative o JavaScript para ver a galeria de vídeos.</p></noscript>
+      </div>
+    </section>
+
+    <!-- ============ SOBRE MIM ============ -->
+    <section class="section about" id="sobre" aria-labelledby="about-title">
+      <div class="container about__grid">
+        <div class="about__visual" data-reveal>
+          <div class="viewfinder" id="about-photo">
+            <svg class="viewfinder__bat" aria-hidden="true"><use href="#bat"/></svg>
+            <span class="viewfinder__corners" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+            <span class="mono viewfinder__rec" aria-hidden="true"><span class="rec"></span>REC</span>
+            <span class="mono viewfinder__id" aria-hidden="true">DUDUBAT • CAM A</span>
+          </div>
+          <div class="about__strip" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        </div>
+        <div class="about__text" data-reveal>
+          <p class="eyebrow"><span class="mono">03</span>Sobre mim</p>
+          <h2 class="title" id="about-title">QUEM ESTÁ POR TRÁS <em>DOS FRAMES?</em></h2>
+          <!-- Texto vem de js/config.js (about.paragraphs) -->
+          <div class="about__body" id="about-body"></div>
+          <a class="btn btn--ghost" href="#contato">Falar com DuduBat</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ SERVIÇOS ============ -->
+    <section class="section services" id="servicos" aria-labelledby="services-title">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <div>
+            <p class="eyebrow"><span class="mono">04</span>Serviços</p>
+            <h2 class="title" id="services-title">O QUE POSSO <em>EDITAR PARA VOCÊ.</em></h2>
+          </div>
+        </div>
+        <!-- Os cards são gerados a partir de js/config.js (services) -->
+        <ul class="services__grid" id="services"></ul>
+      </div>
+    </section>
+
+    <!-- ============ FILOSOFIA ============ -->
+    <section class="section pillars" id="filosofia" aria-labelledby="pillars-title">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <div>
+            <p class="eyebrow"><span class="mono">05</span>Filosofia de trabalho</p>
+            <h2 class="title" id="pillars-title">MAIS DO QUE <em>UMA EDIÇÃO.</em></h2>
+          </div>
+        </div>
+        <ol class="pillars__list">
+          <li class="pillar" data-reveal>
+            <span class="pillar__n" aria-hidden="true">01</span>
+            <h3>Criatividade</h3>
+            <p>Cada projeto merece uma identidade visual própria.</p>
+          </li>
+          <li class="pillar" data-reveal>
+            <span class="pillar__n" aria-hidden="true">02</span>
+            <h3>Atenção aos detalhes</h3>
+            <p>Pequenos ajustes fazem diferença no resultado.</p>
+          </li>
+          <li class="pillar" data-reveal>
+            <span class="pillar__n" aria-hidden="true">03</span>
+            <h3>Ritmo</h3>
+            <p>Uma edição bem construída mantém o interesse do espectador.</p>
+          </li>
+          <li class="pillar" data-reveal>
+            <span class="pillar__n" aria-hidden="true">04</span>
+            <h3>Identidade</h3>
+            <p>Cada vídeo deve ter uma apresentação visual coerente com seu objetivo.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ CONTATO ============ -->
+    <section class="section contact" id="contato" aria-labelledby="contact-title">
+      <div class="container">
+        <div class="contact__card" data-reveal>
+          <svg class="contact__bat" aria-hidden="true"><use href="#bat"/></svg>
+          <p class="eyebrow"><span class="mono">06</span>Contato</p>
+          <h2 class="title title--xl" id="contact-title">VAMOS CRIAR <em>ALGO INCRÍVEL?</em></h2>
+          <p class="lead">Tem um projeto em mente? Entre em contato e vamos transformar sua ideia em um conteúdo visual de impacto.</p>
+          <!-- Os links vêm de js/config.js (contact) -->
+          <div class="contact__actions" id="contact-actions"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ RODAPÉ ============ -->
+  <footer class="footer">
+    <div class="container footer__row">
+      <div class="footer__brand">
+        <a class="brand" href="#inicio" aria-label="DuduBat — voltar ao início">
+          <svg class="brand__bat" aria-hidden="true"><use href="#bat"/></svg>
+          <span class="brand__name">DUDU<span>BAT</span></span>
+        </a>
+        <p>Criatividade em cada frame.</p>
+      </div>
+      <nav aria-label="Navegação do rodapé">
+        <ul class="footer__nav">
+          <li><a href="#inicio">Início</a></li>
+          <li><a href="#portfolio">Portfólio</a></li>
+          <li><a href="#sobre">Sobre mim</a></li>
+          <li><a href="#servicos">Serviços</a></li>
+          <li><a href="#contato">Contato</a></li>
+        </ul>
+      </nav>
+      <ul class="footer__social" id="footer-social" aria-label="Redes sociais"></ul>
+    </div>
+    <div class="container footer__legal">
+      <p>© <span id="year">2026</span> DuduBat. Todos os direitos reservados.</p>
+      <p class="mono">EDITADO NO ESCURO</p>
+    </div>
+  </footer>
+
+  <!-- ============ PLAYER (MODAL) ============ -->
+  <div class="player" id="player" role="dialog" aria-modal="true" aria-labelledby="player-title" hidden>
+    <div class="player__backdrop" data-close></div>
+    <div class="player__stage">
+      <div class="player__top">
+        <div class="player__meta">
+          <span class="mono" id="player-count">01 / 05</span>
+          <h2 id="player-title">Título</h2>
+        </div>
+        <button class="icon-btn player__close" type="button" data-close aria-label="Fechar player (Esc)">
+          <svg aria-hidden="true"><use href="#i-close"/></svg>
+        </button>
+      </div>
+      <div class="player__frame" id="player-frame">
+        <video id="player-video" controls playsinline preload="none"></video>
+      </div>
+      <div class="player__nav">
+        <button class="icon-btn" type="button" id="player-prev" aria-label="Vídeo anterior">
+          <svg aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-chev"/></svg>
+        </button>
+        <span class="mono player__hint">ESC para fechar • ← → para navegar</span>
+        <button class="icon-btn" type="button" id="player-next" aria-label="Próximo vídeo">
+          <svg aria-hidden="true"><use href="#i-chev"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/config.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>
