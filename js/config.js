@@ -16,16 +16,16 @@ window.DUDUBAT = {
   contact: {
     // WhatsApp: número completo com código do país e DDD, só números.
     // Exemplo de formato: "5511999999999"
-    whatsapp: "",
+    whatsapp: "5531982521266",
 
     // Mensagem que já vem escrita quando a pessoa abre o WhatsApp.
     whatsappMessage: "Olá, DuduBat! Vi seu portfólio e quero conversar sobre um projeto.",
 
     // Instagram: apenas o nome de usuário, sem @. Exemplo de formato: "seuusuario"
-    instagram: "",
+    instagram: "dudu_bat",
 
     // E-mail de contato. Exemplo de formato: "voce@seudominio.com"
-    email: "",
+    email: "eduandradegimenes@gmail.com",
 
     // Assunto que já vem preenchido no e-mail.
     emailSubject: "Projeto de edição de vídeo"
