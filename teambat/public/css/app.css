@@ -303,6 +303,7 @@ button.set__prev:hover { border-color: var(--line); color: var(--white); }
 .rx__fields .input { min-height: 44px; padding: 8px 10px; text-align: center; font-weight: 700; }
 .pick { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; width: 100%; text-align: left; border: 1px solid transparent; }
 .pick:hover { background: rgba(168, 85, 247, .08); border-color: var(--line); }
+.pick.is-new { border-color: var(--neon); background: rgba(168, 85, 247, .12); box-shadow: 0 0 22px -10px var(--neon); }
 .lib-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
 .lib-item { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: var(--radius); background: var(--surface); border: 1px solid var(--line-soft); text-align: left; transition: border-color .2s, transform .3s var(--ease); }
 .lib-item:hover { border-color: var(--line); transform: translateY(-2px); }

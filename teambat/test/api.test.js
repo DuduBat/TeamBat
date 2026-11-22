@@ -175,6 +175,22 @@ test('troca de senha, redefinição e desativação', async () => {
   assert.equal((await bia('POST', '/api/login', { email: 'bia@test.dev', password: reset.data.temporaryPassword })).status, 200);
 });
 
+test('exercício cadastrado na montagem da ficha entra na biblioteca e na ficha do aluno', async () => {
+  const created = await admin('POST', '/api/admin/exercises', { name: 'Supino declinado na máquina', muscleGroup: 'Peito', instructions: 'Teste' });
+  assert.equal(created.status, 200);
+  const lib = (await admin('GET', '/api/exercises')).data.exercises;
+  assert.ok(lib.some((e) => e.id === created.data.id && !e.archived && e.muscleGroup === 'Peito'));
+  const r = await admin('POST', `/api/admin/days/${ctx.biaDay}/exercises`, { exerciseId: created.data.id, sets: 3, repsMin: 8, repsMax: 12, restSeconds: 90, notes: '' });
+  assert.equal(r.status, 200);
+  const plan = (await bia('GET', '/api/plan')).data.days[0];
+  const item = plan.exercises.find((e) => e.exerciseId === created.data.id);
+  assert.equal(item.name, 'Supino declinado na máquina');
+  assert.equal(item.instructions, 'Teste');
+  // mesmas validações do cadastro da Biblioteca
+  assert.equal((await admin('POST', '/api/admin/exercises', { name: '', muscleGroup: 'Peito' })).status, 400);
+  assert.equal((await bia('POST', '/api/admin/exercises', { name: 'X', muscleGroup: 'Peito' })).status, 403);
+});
+
 test('biblioteca, observações e dados de demonstração', async () => {
   const r = await admin('POST', '/api/admin/exercises', { name: 'Remada cavalinho', muscleGroup: 'Costas', instructions: '' });
   assert.equal(r.status, 200);

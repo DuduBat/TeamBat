@@ -272,26 +272,49 @@
       root.innerHTML = html;
     }
     function currentDay() { return days.filter(function (d) { return d.id === active; })[0]; }
+    function loadLibrary(force) {
+      if (library && !force) return Promise.resolve(library);
+      return TB.get('/exercises').then(function (r) { library = r.exercises.filter(function (e) { return !e.archived; }); return library; });
+    }
     function openPicker() {
-      var load = library ? Promise.resolve(library) : TB.get('/exercises').then(function (r) { library = r.exercises.filter(function (e) { return !e.archived; }); return library; });
-      load.then(function (lib) {
+      loadLibrary().then(function () {
         TB.modal({
           title: 'Adicionar exercício ao treino ' + currentDay().label,
           body: '<div class="row"><input class="input grow" type="search" data-q placeholder="Pesquisar exercício" aria-label="Pesquisar exercício">' +
-            '<select class="select" data-g aria-label="Grupo muscular" style="width:auto"><option value="">Todos os grupos</option>' + TB.state.muscleGroups.map(function (g) { return '<option>' + esc(g) + '</option>'; }).join('') + '</select></div>' +
+            '<select class="select" data-g aria-label="Grupo muscular" style="width:auto"><option value="">Todos os grupos</option>' + TB.state.muscleGroups.map(function (g) { return '<option>' + esc(g) + '</option>'; }).join('') + '</select>' +
+            '<button class="btn btn--primary btn--sm" type="button" data-newex>' + TB.icon('plus') + 'Novo exercício</button></div>' +
             '<div data-results class="stack" style="gap:4px;min-height:240px"></div>',
           foot: '<button class="btn btn--ghost btn--sm" type="button" data-close>Concluir</button>',
           onOpen: function (el) {
             var q = el.querySelector('[data-q]'), g = el.querySelector('[data-g]'), out = el.querySelector('[data-results]');
-            function list() {
+            /** highlight: id de um exercício recém-cadastrado, mostrado no topo e destacado */
+            function list(highlight) {
               var term = q.value.trim().toLowerCase();
-              var items = lib.filter(function (e) { return (!g.value || e.muscleGroup === g.value) && (!term || e.name.toLowerCase().indexOf(term) > -1); });
+              var items = library.filter(function (e) { return (!g.value || e.muscleGroup === g.value) && (!term || e.name.toLowerCase().indexOf(term) > -1); });
+              if (highlight) items.sort(function (a, b) { return (b.id === highlight) - (a.id === highlight); });
               out.innerHTML = items.length ? items.map(function (e) {
-                return '<button class="pick" type="button" data-pick="' + e.id + '">' + TB.thumb(e, 'sm') + '<span class="grow"><strong>' + esc(e.name) + '</strong><br><span class="muted" style="font-size:.8rem">' + esc(e.muscleGroup) + '</span></span>' + TB.icon('plus', 'list__chev') + '</button>';
-              }).join('') : '<p class="muted" style="padding:20px 0">Nada encontrado. Cadastre o movimento em <a class="link" href="#/biblioteca">Biblioteca de exercícios</a>.</p>';
+                var isNew = e.id === highlight;
+                return '<button class="pick' + (isNew ? ' is-new' : '') + '" type="button" data-pick="' + e.id + '">' + TB.thumb(e, 'sm') + '<span class="grow"><strong>' + esc(e.name) + '</strong>' +
+                  (isNew ? ' <span class="chip chip--purple">recém-cadastrado</span>' : '') + '<br><span class="muted" style="font-size:.8rem">' + esc(e.muscleGroup) + '</span></span>' + TB.icon('plus', 'list__chev') + '</button>';
+              }).join('') : '<div class="empty"><strong>Nenhum exercício encontrado</strong><p>' + (term ? 'Não há "' + esc(q.value.trim()) + '" na biblioteca.' : 'Não há exercícios neste grupo.') + '</p>' +
+                '<button class="btn btn--primary btn--sm" type="button" data-newex>' + TB.icon('plus') + (term ? 'Cadastrar "' + esc(q.value.trim()) + '"' : 'Novo exercício') + '</button></div>';
             }
             list();
-            q.addEventListener('input', list); g.addEventListener('change', list);
+            q.addEventListener('input', function () { list(); }); g.addEventListener('change', function () { list(); });
+            // Cadastra pelo mesmo formulário da Biblioteca, pré-preenchido com a busca e o grupo escolhidos
+            TB.on(el, 'click', '[data-newex]', function () {
+              TB.exerciseForm(null, {
+                defaults: { name: q.value.trim(), muscleGroup: g.value },
+                after: function (id) {
+                  loadLibrary(true).then(function () {
+                    q.value = ''; g.value = '';
+                    list(id);
+                    var created = out.querySelector('[data-pick="' + id + '"]');
+                    if (created) { created.focus(); created.scrollIntoView({ block: 'nearest' }); }
+                  }, TB.fail);
+                }
+              });
+            });
             TB.on(out, 'click', '[data-pick]', function (e, b) {
               b.disabled = true;
               TB.api('POST', '/admin/days/' + active + '/exercises', { exerciseId: Number(b.dataset.pick), sets: 3, repsMin: 8, repsMax: 12, restSeconds: 90, notes: '' })
@@ -356,6 +379,43 @@
       img.src = url;
     });
   }
+  /** Formulário de cadastro e edição de exercícios da biblioteca.
+      Usado na Biblioteca e na montagem de fichas, para que exista um único cadastro.
+      opts.defaults: { name, muscleGroup } pré-preenchem um exercício novo.
+      opts.after(id): chamado depois de salvar, com o id do exercício. */
+  TB.exerciseForm = function (ex, opts) {
+    ex = ex || {}; opts = opts || {};
+    var defaults = opts.defaults || {};
+    var image = ex.image || null;
+    TB.formModal({
+      title: ex.id ? 'Editar exercício' : 'Novo exercício', submit: ex.id ? 'Salvar' : 'Cadastrar',
+      fields: TB.field('Nome do exercício', 'name', ex.id ? ex.name : defaults.name, 'required maxlength="80"') +
+        '<label class="field"><span>Grupo muscular</span><select class="select" name="muscleGroup">' + TB.state.muscleGroups.map(function (g) { return '<option' + (g === (ex.muscleGroup || defaults.muscleGroup) ? ' selected' : '') + '>' + esc(g) + '</option>'; }).join('') + '</select></label>' +
+        '<label class="field"><span>Instruções de execução (opcional)</span><textarea class="textarea" name="instructions" maxlength="600">' + esc(ex.instructions || '') + '</textarea></label>' +
+        '<div class="field"><span>Imagem demonstrativa (opcional)</span><div class="row"><span data-preview></span><div class="grow stack" style="gap:8px">' +
+        '<input class="input" type="file" accept="image/png,image/jpeg,image/webp" data-file aria-label="Enviar imagem">' +
+        '<button class="btn btn--ghost btn--sm" type="button" data-noimg style="justify-self:start">Usar ilustração padrão</button></div></div>' +
+        '<p class="muted" style="font-size:.8rem">Sem imagem, o app mostra a ilustração do grupo muscular. Envie apenas imagens que você tem direito de usar.</p></div>' +
+        (ex.id ? '<label class="check"><input type="checkbox" name="archived"' + (ex.archived ? ' checked' : '') + '> Arquivar (some da busca ao montar fichas; o histórico é mantido)</label>' : ''),
+      onOpen: function (f) {
+        function preview() { f.querySelector('[data-preview]').innerHTML = TB.thumb({ image: image, name: f.name.value, muscleGroup: f.muscleGroup.value }, 'lg'); }
+        preview();
+        f.muscleGroup.addEventListener('change', preview);
+        f.querySelector('[data-file]').addEventListener('change', function (e) {
+          if (e.target.files[0]) resizeImage(e.target.files[0]).then(function (d) { image = d; preview(); }, TB.fail);
+        });
+        f.querySelector('[data-noimg]').addEventListener('click', function () { image = null; f.querySelector('[data-file]').value = ''; preview(); });
+      },
+      onSubmit: function (d) {
+        var body = { name: d.name, muscleGroup: d.muscleGroup, instructions: d.instructions, image: image, archived: !!d.archived };
+        return ex.id ? TB.api('PUT', '/admin/exercises/' + ex.id, body) : TB.api('POST', '/admin/exercises', body);
+      },
+      after: function (r) {
+        TB.toast(ex.id ? 'Exercício atualizado.' : 'Exercício cadastrado.');
+        if (opts.after) opts.after(ex.id || r.id);
+      }
+    });
+  };
   V.biblioteca = function (root) {
     var filter = { q: '', group: '', archived: false }, lib = [];
     function load() { return TB.get('/exercises').then(function (r) { lib = r.exercises; draw(); }); }
@@ -372,35 +432,7 @@
           }).join('') + '</div></section>';
       }).join('') : TB.empty('Nenhum exercício encontrado', 'Ajuste a busca ou cadastre um novo movimento.');
     }
-    function form(ex) {
-      ex = ex || {};
-      var image = ex.image || null;
-      TB.formModal({
-        title: ex.id ? 'Editar exercício' : 'Novo exercício', submit: ex.id ? 'Salvar' : 'Cadastrar',
-        fields: TB.field('Nome do exercício', 'name', ex.name, 'required maxlength="80"') +
-          '<label class="field"><span>Grupo muscular</span><select class="select" name="muscleGroup">' + TB.state.muscleGroups.map(function (g) { return '<option' + (g === (ex.muscleGroup || filter.group) ? ' selected' : '') + '>' + esc(g) + '</option>'; }).join('') + '</select></label>' +
-          '<label class="field"><span>Instruções de execução (opcional)</span><textarea class="textarea" name="instructions" maxlength="600">' + esc(ex.instructions || '') + '</textarea></label>' +
-          '<div class="field"><span>Imagem demonstrativa (opcional)</span><div class="row"><span data-preview></span><div class="grow stack" style="gap:8px">' +
-          '<input class="input" type="file" accept="image/png,image/jpeg,image/webp" data-file aria-label="Enviar imagem">' +
-          '<button class="btn btn--ghost btn--sm" type="button" data-noimg style="justify-self:start">Usar ilustração padrão</button></div></div>' +
-          '<p class="muted" style="font-size:.8rem">Sem imagem, o app mostra a ilustração do grupo muscular. Envie apenas imagens que você tem direito de usar.</p></div>' +
-          (ex.id ? '<label class="check"><input type="checkbox" name="archived"' + (ex.archived ? ' checked' : '') + '> Arquivar (some da busca ao montar fichas; o histórico é mantido)</label>' : ''),
-        onOpen: function (f) {
-          function preview() { f.querySelector('[data-preview]').innerHTML = TB.thumb({ image: image, name: f.name.value, muscleGroup: f.muscleGroup.value }, 'lg'); }
-          preview();
-          f.muscleGroup.addEventListener('change', preview);
-          f.querySelector('[data-file]').addEventListener('change', function (e) {
-            if (e.target.files[0]) resizeImage(e.target.files[0]).then(function (d) { image = d; preview(); }, TB.fail);
-          });
-          f.querySelector('[data-noimg]').addEventListener('click', function () { image = null; f.querySelector('[data-file]').value = ''; preview(); });
-        },
-        onSubmit: function (d) {
-          var body = { name: d.name, muscleGroup: d.muscleGroup, instructions: d.instructions, image: image, archived: !!d.archived };
-          return ex.id ? TB.api('PUT', '/admin/exercises/' + ex.id, body) : TB.api('POST', '/admin/exercises', body);
-        },
-        after: function () { TB.toast(ex.id ? 'Exercício atualizado.' : 'Exercício cadastrado.'); load(); }
-      });
-    }
+    function form(ex) { TB.exerciseForm(ex, { defaults: { muscleGroup: filter.group }, after: load }); }
     root.innerHTML = head('Movimentos por grupo muscular', 'Biblioteca de <em>exercícios.</em>', '<button class="btn btn--primary btn--sm" type="button" data-new>' + TB.icon('plus') + 'Novo exercício</button>') +
       '<div class="row"><input class="input grow" type="search" data-q placeholder="Pesquisar exercício" aria-label="Pesquisar exercício">' +
       '<label class="check"><input type="checkbox" data-arch> Mostrar arquivados</label></div>' +

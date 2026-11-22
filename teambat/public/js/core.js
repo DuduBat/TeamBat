@@ -160,7 +160,11 @@
       if (last && last.focus) last.focus();
       if (opts.onClose) opts.onClose(value);
     }
-    function onKey(e) { if (e.key === 'Escape') close(); }
+    function onKey(e) {
+      if (e.key !== 'Escape') return;
+      var open = document.querySelectorAll('.modal');
+      if (open[open.length - 1] === el) close(); // com modais empilhados, Esc fecha só o de cima
+    }
     el.addEventListener('click', function (e) { if (e.target.closest('[data-close]')) close(); });
     document.addEventListener('keydown', onKey);
     document.body.appendChild(el);
