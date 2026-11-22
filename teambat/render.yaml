@@ -15,5 +15,3 @@ services:
         value: /data
       - key: COOKIE_SECURE
         value: "1"
-      - key: SETUP_TOKEN
-        generateValue: true

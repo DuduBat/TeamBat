@@ -71,7 +71,6 @@ CREATE TABLE IF NOT EXISTS day_exercises (
   sets INTEGER NOT NULL DEFAULT 3,
   reps_min INTEGER NOT NULL DEFAULT 8,
   reps_max INTEGER NOT NULL DEFAULT 12,
-  rest_seconds INTEGER NOT NULL DEFAULT 90,
   notes TEXT NOT NULL DEFAULT ''
 );
 -- Os treinos guardam uma cópia da prescrição do dia: editar a ficha depois
@@ -95,7 +94,6 @@ CREATE TABLE IF NOT EXISTS workout_exercises (
   sets INTEGER NOT NULL,
   reps_min INTEGER NOT NULL,
   reps_max INTEGER NOT NULL,
-  rest_seconds INTEGER NOT NULL,
   notes TEXT NOT NULL DEFAULT '',
   done_at TEXT
 );
@@ -122,6 +120,13 @@ CREATE INDEX IF NOT EXISTS idx_we_exercise ON workout_exercises(exercise_id);
 CREATE INDEX IF NOT EXISTS idx_sets_we ON sets(workout_exercise_id);
 CREATE INDEX IF NOT EXISTS idx_days_student ON days(student_id);
 `);
+
+// Migração: a funcionalidade de descanso foi removida; bancos antigos perdem a coluna.
+for (const table of ['day_exercises', 'workout_exercises']) {
+  if (db.prepare(`PRAGMA table_info(${table})`).all().some((c) => c.name === 'rest_seconds')) {
+    db.exec(`ALTER TABLE ${table} DROP COLUMN rest_seconds`);
+  }
+}
 
 const stmts = new Map();
 function prep(sql) { let s = stmts.get(sql); if (!s) { s = db.prepare(sql); stmts.set(sql, s); } return s; }
@@ -226,7 +231,7 @@ function getWorkout(ctx, id, { write } = {}) {
 function planFor(studentId) {
   const days = all('SELECT id, label, name, position FROM days WHERE student_id = ? AND archived = 0 ORDER BY position, id', studentId);
   const rows = all(`SELECT de.id, de.day_id AS dayId, de.exercise_id AS exerciseId, de.position, de.sets, de.reps_min AS repsMin,
-      de.reps_max AS repsMax, de.rest_seconds AS restSeconds, de.notes, e.name, e.muscle_group AS muscleGroup,
+      de.reps_max AS repsMax, de.notes, e.name, e.muscle_group AS muscleGroup,
       e.instructions, e.image
     FROM day_exercises de JOIN exercises e ON e.id = de.exercise_id JOIN days d ON d.id = de.day_id
     WHERE d.student_id = ? AND d.archived = 0 ORDER BY de.position, de.id`, studentId);
@@ -257,7 +262,7 @@ function weekInfo(studentId, target) {
 }
 function workoutDetail(w) {
   const exercises = all(`SELECT we.id, we.exercise_id AS exerciseId, we.exercise_name AS name, we.position, we.sets, we.reps_min AS repsMin,
-      we.reps_max AS repsMax, we.rest_seconds AS restSeconds, we.notes, we.done_at AS doneAt,
+      we.reps_max AS repsMax, we.notes, we.done_at AS doneAt,
       e.muscle_group AS muscleGroup, e.instructions, e.image
     FROM workout_exercises we JOIN exercises e ON e.id = we.exercise_id WHERE we.workout_id = ? ORDER BY we.position, we.id`, w.id);
   const sets = all(`SELECT s.workout_exercise_id AS weId, s.set_number AS n, s.weight, s.reps, s.note, s.updated_at AS updatedAt
@@ -331,7 +336,6 @@ route('GET', '/api/state', PUBLIC, (ctx) => ({
 
 route('POST', '/api/setup', PUBLIC, (ctx) => {
   if (!needsSetup()) throw new HttpError(403, 'A configuração inicial já foi feita.');
-  if (process.env.SETUP_TOKEN && ctx.body.setupToken !== process.env.SETUP_TOKEN) throw new HttpError(403, 'Código de instalação incorreto.');
   const name = str(ctx.body.name, 80, 'Nome', true);
   const mail = email(ctx.body.email);
   const pass = password(ctx.body.password);
@@ -412,8 +416,8 @@ route('POST', '/api/workouts', STUDENT, (ctx) => {
   if (!items.length) throw bad('Este treino ainda não tem exercícios cadastrados.');
   const id = tx(() => {
     const w = run('INSERT INTO workouts (student_id, day_id, day_label, day_name, started_at) VALUES (?,?,?,?,?)', ctx.user.id, day.id, day.label, day.name, now());
-    items.forEach((it, i) => run(`INSERT INTO workout_exercises (workout_id, exercise_id, exercise_name, position, sets, reps_min, reps_max, rest_seconds, notes)
-      VALUES (?,?,?,?,?,?,?,?,?)`, w.id, it.exercise_id, it.name, i, it.sets, it.reps_min, it.reps_max, it.rest_seconds, it.notes));
+    items.forEach((it, i) => run(`INSERT INTO workout_exercises (workout_id, exercise_id, exercise_name, position, sets, reps_min, reps_max, notes)
+      VALUES (?,?,?,?,?,?,?,?)`, w.id, it.exercise_id, it.name, i, it.sets, it.reps_min, it.reps_max, it.notes));
     return w.id;
   });
   return { workout: workoutDetail(one('SELECT * FROM workouts WHERE id = ?', id)) };
@@ -603,7 +607,6 @@ function prescription(b, base) {
     sets: b.sets === undefined && base ? base.sets : int(b.sets, 1, 12, 'Séries'),
     repsMin: b.repsMin === undefined && base ? base.reps_min : int(b.repsMin, 1, 100, 'Repetições (mínimo)'),
     repsMax: b.repsMax === undefined && base ? base.reps_max : int(b.repsMax, 1, 100, 'Repetições (máximo)'),
-    rest: b.restSeconds === undefined && base ? base.rest_seconds : int(b.restSeconds, 0, 900, 'Descanso'),
     notes: b.notes === undefined && base ? base.notes : str(b.notes, 500, 'Observações')
   };
   if (p.repsMax < p.repsMin) throw bad('O máximo de repetições não pode ser menor que o mínimo.');
@@ -615,8 +618,8 @@ route('POST', '/api/admin/days/:id/exercises', ADMIN, (ctx) => {
   if (!ex) throw new HttpError(404, 'Exercício não encontrado na biblioteca.');
   const p = prescription(ctx.body);
   const pos = one('SELECT COALESCE(MAX(position), -1) + 1 AS p FROM day_exercises WHERE day_id = ?', d.id).p;
-  run('INSERT INTO day_exercises (day_id, exercise_id, position, sets, reps_min, reps_max, rest_seconds, notes) VALUES (?,?,?,?,?,?,?,?)',
-    d.id, ex.id, pos, p.sets, p.repsMin, p.repsMax, p.rest, p.notes);
+  run('INSERT INTO day_exercises (day_id, exercise_id, position, sets, reps_min, reps_max, notes) VALUES (?,?,?,?,?,?,?)',
+    d.id, ex.id, pos, p.sets, p.repsMin, p.repsMax, p.notes);
   return { days: planFor(d.student_id) };
 });
 function getDayExercise(id) {
@@ -627,7 +630,7 @@ function getDayExercise(id) {
 route('PUT', '/api/admin/day-exercises/:id', ADMIN, (ctx) => {
   const de = getDayExercise(ctx.params.id);
   const p = prescription(ctx.body, de);
-  run('UPDATE day_exercises SET sets = ?, reps_min = ?, reps_max = ?, rest_seconds = ?, notes = ? WHERE id = ?', p.sets, p.repsMin, p.repsMax, p.rest, p.notes, de.id);
+  run('UPDATE day_exercises SET sets = ?, reps_min = ?, reps_max = ?, notes = ? WHERE id = ?', p.sets, p.repsMin, p.repsMax, p.notes, de.id);
   return { days: planFor(de.student_id) };
 });
 route('DELETE', '/api/admin/day-exercises/:id', ADMIN, (ctx) => {

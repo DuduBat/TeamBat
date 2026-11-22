@@ -40,7 +40,7 @@
   function loginScreen() {
     var form = authScreen('<form class="card form" novalidate><h2 class="h2">Entrar</h2>' +
       '<label class="field"><span>E-mail</span><input class="input" type="email" name="email" autocomplete="username" inputmode="email" required></label>' +
-      '<label class="field"><span>Senha</span><input class="input" type="password" name="password" autocomplete="current-password" required></label>' +
+      TB.passwordField('Senha', 'password', 'current-password', 'required') +
       '<p class="form-error" hidden></p><button class="btn btn--primary btn--block" type="submit">Entrar</button>' +
       '<p class="muted" style="font-size:.84rem">Alunos recebem o acesso do treinador. Esqueceu a senha? Peça uma nova a ele.</p></form>');
     submitter(form, function (d) { return TB.api('POST', '/login', d); }, function (r) { TB.state.user = r.user; location.hash = '#/'; start(); });
@@ -50,8 +50,7 @@
       '<p class="muted">Crie a conta do treinador. É com ela que você administra alunos, fichas e progressão.</p>' +
       '<label class="field"><span>Seu nome</span><input class="input" name="name" autocomplete="name" required maxlength="80"></label>' +
       '<label class="field"><span>E-mail</span><input class="input" type="email" name="email" autocomplete="username" required></label>' +
-      '<label class="field"><span>Senha (mínimo 8 caracteres)</span><input class="input" type="password" name="password" autocomplete="new-password" minlength="8" required></label>' +
-      '<label class="field"><span>Código de instalação (só se foi configurado no servidor)</span><input class="input" name="setupToken" autocomplete="off"></label>' +
+      TB.passwordField('Senha (mínimo 8 caracteres)', 'password', 'new-password', 'minlength="8" required') +
       '<label class="check"><input type="checkbox" name="demo" checked> Incluir 3 alunos fictícios de demonstração (marcados como DEMO, removíveis depois)</label>' +
       '<p class="form-error" hidden></p><button class="btn btn--primary btn--block" type="submit">Criar conta do treinador</button></form>');
     submitter(form, function (d) { return TB.api('POST', '/setup', d); }, function (r) { TB.state.user = r.user; location.hash = '#/'; start(); });
@@ -59,8 +58,8 @@
   function firstPasswordScreen() {
     var form = authScreen('<form class="card form" novalidate><h2 class="h2">Crie sua senha</h2>' +
       '<p class="muted">Olá, ' + esc(TB.firstName(TB.state.user.name)) + '. Por segurança, troque a senha provisória por uma só sua.</p>' +
-      '<label class="field"><span>Senha provisória</span><input class="input" type="password" name="current" autocomplete="current-password" required></label>' +
-      '<label class="field"><span>Nova senha (mínimo 8 caracteres)</span><input class="input" type="password" name="password" autocomplete="new-password" minlength="8" required></label>' +
+      TB.passwordField('Senha provisória', 'current', 'current-password', 'required') +
+      TB.passwordField('Nova senha (mínimo 8 caracteres)', 'password', 'new-password', 'minlength="8" required') +
       '<p class="form-error" hidden></p><button class="btn btn--primary btn--block" type="submit">Salvar e entrar</button>' +
       '<button class="btn btn--ghost btn--sm" type="button" data-logout>Sair</button></form>');
     form.querySelector('[data-logout]').addEventListener('click', TB.logout);
@@ -95,7 +94,6 @@
     var views = TB.views[u.role], home = NAV[u.role][0][0];
     var name = parts[0] || home;
     if (!views[name]) { location.hash = '#/' + home; return; }
-    if (TB.leaveWorkout) TB.leaveWorkout();
     var active = ALIAS[name] || name;
     app.querySelectorAll('[data-nav]').forEach(function (a) {
       var on = a.dataset.nav === active;

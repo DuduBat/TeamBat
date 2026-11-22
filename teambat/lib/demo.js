@@ -7,28 +7,28 @@
 exports.PASSWORD = 'demo1234';
 
 const B = (label, name, items) => ({ label, name, items });
-// [exercício, séries, repMin, repMax, descanso(s), carga inicial(kg), incremento(kg), observação]
+// [exercício, séries, repMin, repMax, carga inicial(kg), incremento(kg), observação]
 const PLANS = [
   {
     name: 'Aluno Demo A (fictício)', email: 'demo.a@teambat.demo', goal: 'Hipertrofia (exemplo)', target: 5, stopDaysAgo: 0, weekdays: [1, 2, 3, 5, 6],
     days: [
       B('A', 'Peito, ombros e tríceps', [
-        ['Supino inclinado com halteres', 3, 8, 12, 120, 26, 2, 'Desça controlando por 2–3 s. Pare 1–2 repetições antes da falha.'],
-        ['Supino reto com barra', 3, 6, 10, 150, 60, 2.5, ''],
-        ['Elevação lateral com halteres', 4, 10, 15, 60, 8, 1, 'Sem embalo. Cotovelo levemente à frente do tronco.'],
-        ['Tríceps na polia com corda', 3, 10, 15, 75, 22.5, 2.5, '']
+        ['Supino inclinado com halteres', 3, 8, 12, 26, 2, 'Desça controlando por 2–3 s. Pare 1–2 repetições antes da falha.'],
+        ['Supino reto com barra', 3, 6, 10, 60, 2.5, ''],
+        ['Elevação lateral com halteres', 4, 10, 15, 8, 1, 'Sem embalo. Cotovelo levemente à frente do tronco.'],
+        ['Tríceps na polia com corda', 3, 10, 15, 22.5, 2.5, '']
       ]),
       B('B', 'Costas e bíceps', [
-        ['Puxada alta na polia', 3, 8, 12, 120, 50, 2.5, 'Puxe com os cotovelos, peito alto.'],
-        ['Remada baixa na polia', 3, 8, 12, 120, 45, 2.5, ''],
-        ['Face pull', 3, 12, 15, 60, 17.5, 2.5, ''],
-        ['Rosca Scott', 3, 8, 12, 90, 20, 2, '']
+        ['Puxada alta na polia', 3, 8, 12, 50, 2.5, 'Puxe com os cotovelos, peito alto.'],
+        ['Remada baixa na polia', 3, 8, 12, 45, 2.5, ''],
+        ['Face pull', 3, 12, 15, 17.5, 2.5, ''],
+        ['Rosca Scott', 3, 8, 12, 20, 2, '']
       ]),
       B('C', 'Pernas', [
-        ['Agachamento no hack', 3, 6, 10, 180, 80, 5, 'Amplitude completa, sem tirar o quadril do encosto.'],
-        ['Cadeira extensora', 3, 10, 15, 90, 45, 2.5, ''],
-        ['Mesa flexora', 3, 8, 12, 90, 35, 2.5, ''],
-        ['Panturrilha em pé na máquina', 4, 8, 12, 60, 60, 5, 'Pausa de 1 s alongado.']
+        ['Agachamento no hack', 3, 6, 10, 80, 5, 'Amplitude completa, sem tirar o quadril do encosto.'],
+        ['Cadeira extensora', 3, 10, 15, 45, 2.5, ''],
+        ['Mesa flexora', 3, 8, 12, 35, 2.5, ''],
+        ['Panturrilha em pé na máquina', 4, 8, 12, 60, 5, 'Pausa de 1 s alongado.']
       ])
     ]
   },
@@ -37,16 +37,16 @@ const PLANS = [
     split: 'Upper/Lower',
     days: [
       B('Upper', 'Membros superiores', [
-        ['Supino reto com barra', 4, 5, 8, 180, 70, 2.5, ''],
-        ['Remada curvada com barra', 4, 6, 10, 150, 55, 2.5, 'Tronco firme, sem roubar com a lombar.'],
-        ['Desenvolvimento com halteres', 3, 8, 12, 120, 18, 2, ''],
-        ['Rosca direta com barra', 3, 8, 12, 90, 25, 2.5, '']
+        ['Supino reto com barra', 4, 5, 8, 70, 2.5, ''],
+        ['Remada curvada com barra', 4, 6, 10, 55, 2.5, 'Tronco firme, sem roubar com a lombar.'],
+        ['Desenvolvimento com halteres', 3, 8, 12, 18, 2, ''],
+        ['Rosca direta com barra', 3, 8, 12, 25, 2.5, '']
       ]),
       B('Lower', 'Membros inferiores', [
-        ['Agachamento livre', 4, 5, 8, 180, 90, 5, 'Mesma profundidade em todas as repetições.'],
-        ['Levantamento terra romeno', 3, 8, 10, 150, 80, 5, ''],
-        ['Leg press 45°', 3, 10, 15, 120, 160, 10, ''],
-        ['Abdominal na polia', 3, 10, 15, 60, 30, 2.5, '']
+        ['Agachamento livre', 4, 5, 8, 90, 5, 'Mesma profundidade em todas as repetições.'],
+        ['Levantamento terra romeno', 3, 8, 10, 80, 5, ''],
+        ['Leg press 45°', 3, 10, 15, 160, 10, ''],
+        ['Abdominal na polia', 3, 10, 15, 30, 2.5, '']
       ])
     ]
   },
@@ -54,14 +54,14 @@ const PLANS = [
     name: 'Aluno Demo C (fictício)', email: 'demo.c@teambat.demo', goal: 'Condicionamento (exemplo)', target: 3, stopDaysAgo: 12, weekdays: [1, 3, 5],
     days: [
       B('A', 'Corpo inteiro 1', [
-        ['Leg press 45°', 3, 10, 15, 120, 100, 10, ''],
-        ['Supino inclinado na máquina', 3, 8, 12, 120, 30, 2.5, ''],
-        ['Remada na máquina', 3, 8, 12, 120, 35, 2.5, '']
+        ['Leg press 45°', 3, 10, 15, 100, 10, ''],
+        ['Supino inclinado na máquina', 3, 8, 12, 30, 2.5, ''],
+        ['Remada na máquina', 3, 8, 12, 35, 2.5, '']
       ]),
       B('B', 'Corpo inteiro 2', [
-        ['Cadeira flexora', 3, 10, 15, 90, 30, 2.5, ''],
-        ['Desenvolvimento na máquina', 3, 8, 12, 120, 20, 2.5, ''],
-        ['Puxada alta na polia', 3, 8, 12, 120, 35, 2.5, '']
+        ['Cadeira flexora', 3, 10, 15, 30, 2.5, ''],
+        ['Desenvolvimento na máquina', 3, 8, 12, 20, 2.5, ''],
+        ['Puxada alta na polia', 3, 8, 12, 35, 2.5, '']
       ])
     ]
   }
@@ -80,12 +80,12 @@ exports.load = function load({ one, run, tx, hashPassword }) {
         VALUES ('student',?,?,?,1,?,?,?,?)`, plan.name, plan.email, hash, plan.goal, plan.split || '', plan.target, created).id;
       const days = plan.days.map((d, di) => {
         const dayId = run('INSERT INTO days (student_id, label, name, position) VALUES (?,?,?,?)', student, d.label, d.name, di).id;
-        const items = d.items.map(([name, sets, rmin, rmax, rest, start, inc, notes], i) => {
+        const items = d.items.map(([name, sets, rmin, rmax, start, inc, notes], i) => {
           let ex = one('SELECT id FROM exercises WHERE name = ?', name);
           if (!ex) ex = { id: run("INSERT INTO exercises (name, muscle_group, created_at) VALUES (?, 'Outros', ?)", name, created).id };
-          run('INSERT INTO day_exercises (day_id, exercise_id, position, sets, reps_min, reps_max, rest_seconds, notes) VALUES (?,?,?,?,?,?,?,?)',
-            dayId, ex.id, i, sets, rmin, rmax, rest, notes);
-          return { exId: ex.id, name, sets, rmin, rmax, rest, notes, inc, w: start, r: rmin + 1 };
+          run('INSERT INTO day_exercises (day_id, exercise_id, position, sets, reps_min, reps_max, notes) VALUES (?,?,?,?,?,?,?)',
+            dayId, ex.id, i, sets, rmin, rmax, notes);
+          return { exId: ex.id, name, sets, rmin, rmax, notes, inc, w: start, r: rmin + 1 };
         });
         return { id: dayId, label: d.label, name: d.name, items };
       });
@@ -101,8 +101,8 @@ exports.load = function load({ one, run, tx, hashPassword }) {
         const wid = run('INSERT INTO workouts (student_id, day_id, day_label, day_name, started_at, finished_at) VALUES (?,?,?,?,?,?)',
           student, day.id, day.label, day.name, start.toISOString(), new Date(start.getTime() + (55 + Math.floor(rnd() * 25)) * 60000).toISOString()).id;
         day.items.forEach((it, i) => {
-          const we = run(`INSERT INTO workout_exercises (workout_id, exercise_id, exercise_name, position, sets, reps_min, reps_max, rest_seconds, notes, done_at)
-            VALUES (?,?,?,?,?,?,?,?,?,?)`, wid, it.exId, it.name, i, it.sets, it.rmin, it.rmax, it.rest, it.notes, start.toISOString()).id;
+          const we = run(`INSERT INTO workout_exercises (workout_id, exercise_id, exercise_name, position, sets, reps_min, reps_max, notes, done_at)
+            VALUES (?,?,?,?,?,?,?,?,?)`, wid, it.exId, it.name, i, it.sets, it.rmin, it.rmax, it.notes, start.toISOString()).id;
           for (let s = 1; s <= it.sets; s++) {
             // fadiga entre séries: cada série tende a render um pouco menos que a anterior
             const reps = Math.max(it.rmin - 2, it.r - (s - 1) - (rnd() < 0.3 ? 1 : 0));

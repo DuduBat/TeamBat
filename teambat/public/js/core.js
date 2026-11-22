@@ -53,8 +53,11 @@
   };
   TB.greeting = function () { var h = new Date().getHours(); return h < 5 ? 'Boa noite' : h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite'; };
   TB.firstName = function (n) { return String(n || '').trim().split(/\s+/)[0]; };
+  /** Texto para comparação em buscas: sem acentos, minúsculo e com espaços normalizados ("Agachamento Búlgaro" -> "agachamento bulgaro") */
+  TB.fold = function (s) { return String(s == null ? '' : s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim(); };
+  /** true se o texto contém o termo, ignorando acentos e maiúsculas; termo vazio casa com tudo */
+  TB.matches = function (text, term) { var t = TB.fold(term); return !t || TB.fold(text).indexOf(t) > -1; };
   TB.reps = function (ex) { return ex.repsMin === ex.repsMax ? String(ex.repsMin) : ex.repsMin + '–' + ex.repsMax; };
-  TB.rest = function (s) { return s >= 60 ? Math.floor(s / 60) + 'min' + (s % 60 ? ' ' + (s % 60) + 's' : '') : s + 's'; };
   TB.setText = function (s) { return (s.weight == null ? '–' : TB.kg(s.weight) + ' kg') + ' × ' + (s.reps == null ? '–' : s.reps); };
 
   /* ---------- Ícones ---------- */
@@ -81,6 +84,8 @@
     sync: '<path d="M20 12a8 8 0 0 1-14.300 4.900M4 12a8 8 0 0 1 14.300-4.900M18.500 3.500v4h-4M5.500 20.500v-4h4"/>',
     alert: '<path d="M12 4 3 19h18zM12 10v4M12 16.800v.2"/>',
     note: '<path d="M5 5h14v10l-4 4H5zM15 19v-4h4M8.500 9.500h7M8.500 13h4"/>',
+    eye: '<path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/>',
+    eyeOff: '<path d="M3 3l18 18M10.6 6.1A10 10 0 0 1 12 6c6 0 9.5 6 9.5 6a16.5 16.5 0 0 1-3.1 3.8M6.6 7.6C3.9 9.3 2.5 12 2.5 12s3.5 6 9.5 6a9.3 9.3 0 0 0 4-.9M9.9 9.9a3 3 0 0 0 4.2 4.2"/>',
     play: '<path d="M8 5.500v13l11-6.500z" fill="currentColor" stroke="none"/>',
     logout: '<path d="M10 4H5v16h5M15 8l4 4-4 4M19 12H9"/>'
   };
@@ -217,6 +222,34 @@
   TB.field = function (label, name, value, attrs) {
     return '<label class="field"><span>' + TB.esc(label) + '</span><input class="input" name="' + name + '" value="' + TB.esc(value == null ? '' : value) + '" ' + (attrs || '') + '></label>';
   };
+  /** Campo de senha com botão para mostrar/ocultar. Começa oculto. */
+  TB.passwordField = function (label, name, autocomplete, attrs) {
+    return '<label class="field"><span>' + TB.esc(label) + '</span><span class="pw">' +
+      '<input class="input" type="password" name="' + name + '" autocomplete="' + autocomplete + '" ' + (attrs || '') + '>' +
+      '<button class="pw__toggle" type="button" data-pw-toggle aria-label="Mostrar senha" aria-pressed="false">' + TB.icon('eye') + '</button></span></label>';
+  };
+  function setPasswordVisible(btn, visible) {
+    var input = btn.parentNode.querySelector('input');
+    input.type = visible ? 'text' : 'password';
+    btn.setAttribute('aria-pressed', String(visible));
+    btn.setAttribute('aria-label', visible ? 'Ocultar senha' : 'Mostrar senha');
+    btn.innerHTML = TB.icon(visible ? 'eyeOff' : 'eye');
+  }
+  // Mantém o foco no campo para quem está digitando
+  document.addEventListener('mousedown', function (e) { if (e.target.closest('[data-pw-toggle]')) e.preventDefault(); });
+  document.addEventListener('click', function (e) {
+    var btn = e.target.closest('[data-pw-toggle]');
+    if (!btn) return;
+    e.preventDefault();
+    var input = btn.parentNode.querySelector('input'), start = input.selectionStart, end = input.selectionEnd;
+    setPasswordVisible(btn, input.type === 'password');
+    input.focus();
+    try { input.setSelectionRange(start, end); } catch (err) { /* sem cursor para restaurar */ }
+  });
+  // Ao limpar o formulário, a senha volta a ficar oculta
+  document.addEventListener('reset', function (e) {
+    e.target.querySelectorAll('[data-pw-toggle]').forEach(function (btn) { setPasswordVisible(btn, false); });
+  }, true);
   TB.on = function (root, type, selector, handler) {
     root.addEventListener(type, function (e) {
       var t = e.target.closest(selector);

@@ -262,7 +262,7 @@
               '<label class="field"><span>Séries</span><input class="input" type="number" inputmode="numeric" min="1" max="12" data-f="sets" value="' + ex.sets + '"></label>' +
               '<label class="field"><span>Reps mín.</span><input class="input" type="number" inputmode="numeric" min="1" max="100" data-f="repsMin" value="' + ex.repsMin + '"></label>' +
               '<label class="field"><span>Reps máx.</span><input class="input" type="number" inputmode="numeric" min="1" max="100" data-f="repsMax" value="' + ex.repsMax + '"></label>' +
-              '<label class="field"><span>Descanso (s)</span><input class="input" type="number" inputmode="numeric" min="0" max="900" step="5" data-f="restSeconds" value="' + ex.restSeconds + '"></label></div>' +
+              '</div>' +
               '<label class="field"><span>Observações técnicas</span><input class="input" data-f="notes" maxlength="500" placeholder="Ex.: descer em 3 s; parar a 1–2 repetições da falha" value="' + esc(ex.notes) + '"></label></div>';
           }).join('') +
           '<div class="rx"><button class="btn btn--primary btn--sm" type="button" data-addex style="justify-self:start">' + TB.icon('plus') + 'Adicionar exercício</button>' +
@@ -289,8 +289,8 @@
             var q = el.querySelector('[data-q]'), g = el.querySelector('[data-g]'), out = el.querySelector('[data-results]');
             /** highlight: id de um exercício recém-cadastrado, mostrado no topo e destacado */
             function list(highlight) {
-              var term = q.value.trim().toLowerCase();
-              var items = library.filter(function (e) { return (!g.value || e.muscleGroup === g.value) && (!term || e.name.toLowerCase().indexOf(term) > -1); });
+              var term = q.value.trim();
+              var items = library.filter(function (e) { return (!g.value || e.muscleGroup === g.value) && TB.matches(e.name, term); });
               if (highlight) items.sort(function (a, b) { return (b.id === highlight) - (a.id === highlight); });
               out.innerHTML = items.length ? items.map(function (e) {
                 var isNew = e.id === highlight;
@@ -317,7 +317,7 @@
             });
             TB.on(out, 'click', '[data-pick]', function (e, b) {
               b.disabled = true;
-              TB.api('POST', '/admin/days/' + active + '/exercises', { exerciseId: Number(b.dataset.pick), sets: 3, repsMin: 8, repsMax: 12, restSeconds: 90, notes: '' })
+              TB.api('POST', '/admin/days/' + active + '/exercises', { exerciseId: Number(b.dataset.pick), sets: 3, repsMin: 8, repsMax: 12, notes: '' })
                 .then(function (r) { setDays(r.days); TB.toast('Exercício adicionado ao treino ' + currentDay().label + '.'); b.disabled = false; }, function (err) { b.disabled = false; TB.fail(err); });
             });
           }
@@ -420,8 +420,7 @@
     var filter = { q: '', group: '', archived: false }, lib = [];
     function load() { return TB.get('/exercises').then(function (r) { lib = r.exercises; draw(); }); }
     function draw() {
-      var q = filter.q.toLowerCase();
-      var items = lib.filter(function (e) { return (filter.archived || !e.archived) && (!filter.group || e.muscleGroup === filter.group) && (!q || e.name.toLowerCase().indexOf(q) > -1); });
+      var items = lib.filter(function (e) { return (filter.archived || !e.archived) && (!filter.group || e.muscleGroup === filter.group) && TB.matches(e.name, filter.q); });
       var groups = {};
       items.forEach(function (e) { (groups[e.muscleGroup] = groups[e.muscleGroup] || []).push(e); });
       root.querySelector('[data-list]').innerHTML = items.length ? TB.state.muscleGroups.filter(function (g) { return groups[g]; }).map(function (g) {

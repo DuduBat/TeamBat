@@ -51,14 +51,13 @@ Para os alunos acessarem do celular, o app precisa estar em um servidor com **di
 (o banco é um arquivo) e **HTTPS**.
 
 **Render** — o arquivo `render.yaml` já descreve tudo: em *New → Blueprint*, aponte para este repositório.
-Ele cria o serviço, o disco em `/data` e um `SETUP_TOKEN` (veja em *Environment*), que a tela de
-configuração inicial vai pedir como "código de instalação".
+Ele cria o serviço e o disco em `/data`.
 
 **Qualquer servidor com Docker**
 
 ```bash
 docker build -t teambat teambat
-docker run -d -p 3000:3000 -v teambat-data:/data -e COOKIE_SECURE=1 -e SETUP_TOKEN=escolha-um-codigo teambat
+docker run -d -p 3000:3000 -v teambat-data:/data -e COOKIE_SECURE=1 teambat
 ```
 
 Coloque um proxy com HTTPS na frente (Caddy, Nginx, Cloudflare).
@@ -71,10 +70,9 @@ Coloque um proxy com HTTPS na frente (Caddy, Nginx, Cloudflare).
 | `DATA_DIR` | pasta do banco de dados | `./data` |
 | `APP_TIMEZONE` | fuso usado em semanas e datas | `America/Sao_Paulo` |
 | `COOKIE_SECURE` | `1` para exigir HTTPS no cookie de sessão | automático atrás de proxy HTTPS |
-| `SETUP_TOKEN` | código exigido para criar a conta do treinador | sem código |
 
-Defina `SETUP_TOKEN` em qualquer servidor público: sem ele, a primeira pessoa que abrir o endereço
-pode criar a conta do treinador.
+Faça a configuração inicial logo depois de publicar: enquanto a conta do treinador não existir,
+quem abrir o endereço primeiro é quem a cria. Depois disso, a tela de configuração não aparece mais.
 
 ## Testes
 

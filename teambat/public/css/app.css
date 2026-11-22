@@ -100,6 +100,13 @@ input, select, textarea { font: inherit; color: inherit; }
 .input:focus, .select:focus, .textarea:focus { outline: none; border-color: var(--neon); box-shadow: 0 0 0 3px rgba(168, 85, 247, .2); }
 .input::placeholder, .textarea::placeholder { color: #5d566b; }
 .form { display: grid; gap: 16px; }
+.pw { position: relative; display: block; }
+.pw .input { padding-right: 52px; }
+.pw .input::-ms-reveal { display: none; }
+.pw__toggle { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); display: grid; place-items: center; width: 40px; height: 40px; border-radius: 10px; color: var(--gray); transition: color .2s, background-color .2s; }
+.pw__toggle:hover { color: var(--white); background: rgba(168, 85, 247, .1); }
+.pw__toggle[aria-pressed="true"] { color: var(--glow); }
+.pw__toggle svg { width: 20px; height: 20px; }
 .form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
 .check { display: flex; gap: 10px; align-items: flex-start; font-size: .9rem; color: var(--gray); }
 .check input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--neon); flex: none; }
@@ -272,9 +279,6 @@ button.set__prev:hover { border-color: var(--line); color: var(--white); }
 .finishbar__bar { height: 4px; border-radius: 4px; background: rgba(245, 240, 250, .08); overflow: hidden; margin-top: 6px; }
 .finishbar__bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--purple), var(--glow)); transition: width .5s var(--ease); }
 .has-finishbar { padding-bottom: 84px; }
-.rest { flex: 1; min-width: 0; display: flex; align-items: center; gap: 10px; animation: fade .3s ease; }
-.rest b { font-family: var(--font-display); font-size: 1.25rem; font-variant-numeric: tabular-nums; color: var(--glow); text-shadow: 0 0 18px rgba(168, 85, 247, .7); }
-.finishbar.is-resting > .grow { display: none; }
 @media (min-width: 960px) { .finishbar { left: var(--side); bottom: 0; padding-inline: clamp(24px, 4vw, 56px); } }
 
 /* ---------- Gráficos ---------- */
@@ -298,7 +302,7 @@ button.set__prev:hover { border-color: var(--line); color: var(--white); }
 /* ---------- Montagem de fichas ---------- */
 .rx { display: grid; gap: 12px; padding: 16px; }
 .rx + .rx { border-top: 1px solid var(--line-soft); }
-.rx__fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.rx__fields { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
 .rx__fields .field > span { font-family: var(--font-mono); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; font-weight: 500; }
 .rx__fields .input { min-height: 44px; padding: 8px 10px; text-align: center; font-weight: 700; }
 .pick { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border-radius: 12px; width: 100%; text-align: left; border: 1px solid transparent; }

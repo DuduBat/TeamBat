@@ -8,7 +8,7 @@
   }
   function rxChips(ex) {
     return '<div class="ex__meta"><span class="chip chip--purple">' + ex.sets + (ex.sets === 1 ? ' série' : ' séries') + '</span>' +
-      '<span class="chip">' + TB.reps(ex) + ' reps</span><span class="chip">descanso ' + TB.rest(ex.restSeconds) + '</span>' +
+      '<span class="chip">' + TB.reps(ex) + ' reps</span>' +
       '<span class="chip">' + esc(ex.muscleGroup) + '</span></div>';
   }
   function coachNote(ex) {
@@ -40,7 +40,7 @@
           '<td class="wrap muted">' + esc(s.note) + '</td></tr>';
       }).join('');
       return '<div class="card stack"><div class="ex">' + TB.thumb(ex, 'sm') + '<div class="grow"><p class="ex__name">' + esc(ex.name) + '</p>' +
-        '<p class="muted" style="font-size:.84rem">Prescrito: ' + ex.sets + ' × ' + TB.reps(ex) + ' · descanso ' + TB.rest(ex.restSeconds) + '</p></div></div>' +
+        '<p class="muted" style="font-size:.84rem">Prescrito: ' + ex.sets + ' × ' + TB.reps(ex) + '</p></div></div>' +
         (rows ? '<div class="table-wrap"><table class="table"><thead><tr><th>Série</th><th>Realizado</th><th>Sessão anterior</th><th>Diferença</th><th>Observação</th></tr></thead><tbody>' + rows + '</tbody></table></div>'
           : '<p class="muted">Nenhuma série registrada neste exercício.</p>') + '</div>';
     }).join('');
@@ -119,36 +119,6 @@
   };
   window.addEventListener('online', function () { if (TB.state.user && TB.state.user.role === 'student') TB.flushPending(); });
 
-  var restTimer = null;
-  function stopRest() {
-    clearInterval(restTimer); restTimer = null;
-    var el = document.querySelector('.rest'), bar = document.querySelector('.finishbar');
-    if (el) el.remove();
-    if (bar) bar.classList.remove('is-resting');
-  }
-  function startRest(seconds) {
-    stopRest();
-    if (!seconds) return;
-    var end = Date.now() + seconds * 1000;
-    var el = document.createElement('div');
-    el.className = 'rest';
-    el.innerHTML = '<span class="mono">Descanso</span><b></b><button class="icon-btn" type="button" aria-label="Pular descanso">' + TB.icon('x') + '</button>';
-    // o cronômetro ocupa o lugar do progresso na barra inferior, sem cobrir os campos
-    var bar = document.querySelector('.finishbar');
-    if (!bar) return;
-    bar.insertBefore(el, bar.firstChild);
-    bar.classList.add('is-resting');
-    el.querySelector('button').addEventListener('click', stopRest);
-    function tick() {
-      var left = Math.max(0, Math.round((end - Date.now()) / 1000));
-      el.querySelector('b').textContent = Math.floor(left / 60) + ':' + ('0' + (left % 60)).slice(-2);
-      if (!left) { stopRest(); if (navigator.vibrate) navigator.vibrate([120, 80, 120]); TB.toast('Descanso encerrado. Próxima série!'); }
-    }
-    tick();
-    restTimer = setInterval(tick, 500);
-  }
-  TB.leaveWorkout = stopRest;
-
   V.treino = function (root, args) {
     var id = Number(args[0]);
     TB.flushPending().then(function () { return TB.get('/workouts/' + id); }).then(function (r) {
@@ -180,7 +150,7 @@
         for (var n = 1; n <= rowCount(ex); n++) rows += rowHtml(ex, n);
         return '<article class="card log' + (ex.id === openId ? ' is-open' : '') + (ex.doneAt ? ' is-done' : '') + '" data-ex="' + ex.id + '">' +
           '<button class="log__head" type="button" data-toggle aria-expanded="' + (ex.id === openId) + '">' + TB.thumb(ex) +
-          '<span class="grow"><span class="ex__name">' + esc(ex.name) + '</span><br><span class="muted num" style="font-size:.84rem">' + ex.sets + ' × ' + TB.reps(ex) + ' · descanso ' + TB.rest(ex.restSeconds) + '</span></span>' +
+          '<span class="grow"><span class="ex__name">' + esc(ex.name) + '</span><br><span class="muted num" style="font-size:.84rem">' + ex.sets + ' × ' + TB.reps(ex) + '</span></span>' +
           '<span class="chip ' + (ex.doneAt ? 'chip--good' : 'chip--purple') + ' num" data-count>' + (ex.doneAt ? 'feito' : filledCount(ex) + '/' + ex.sets) + '</span></button>' +
           '<div class="log__body">' + coachNote(ex) +
           (ex.previous ? '<p class="muted" style="font-size:.8rem">Última vez: ' + TB.date(ex.previous.date) + '. Toque no valor anterior para repetir a carga.</p>' : '<p class="muted" style="font-size:.8rem">Primeiro registro deste exercício.</p>') +
@@ -225,7 +195,6 @@
           TB.toast('Confira os valores da série ' + n + '.', 'error');
           return Promise.resolve();
         }
-        var before = logged(ex, n), hadReps = before && before.reps != null;
         var path = '/workouts/' + w.id + '/exercises/' + ex.id + '/sets/' + n;
         stateEl.className = 'set__state is-saving'; stateEl.innerHTML = TB.icon('sync');
         pendingSet(path, body);
@@ -238,7 +207,6 @@
           var cmp = row.querySelector('[data-cmp]');
           if (cmp) cmp.innerHTML = cmpChip(r.set, prevOf(ex, n));
           refreshMeta(ex);
-          if (body.reps !== null && !hadReps && filledCount(ex) < rowCount(ex)) startRest(ex.restSeconds);
         }, function (err) {
           stateEl.className = 'set__state is-error'; stateEl.innerHTML = TB.icon('alert');
           if (err.offline) TB.toast('Sem conexão: a série ficou guardada no aparelho e será enviada depois.', 'error');
@@ -303,7 +271,6 @@
         btn.disabled = true;
         settle().then(function () { return TB.api('POST', '/workouts/' + w.id + '/exercises/' + ex.id + '/done', { done: done }); }).then(function () {
           ex.doneAt = done ? new Date().toISOString() : null;
-          stopRest();
           if (done) {
             var nextEx = w.exercises.filter(function (x) { return !x.doneAt; })[0];
             openId = nextEx ? nextEx.id : null;
@@ -319,7 +286,7 @@
         TB.confirm('Descartar este treino?', 'As séries registradas neste treino em andamento serão apagadas. Esta ação não pode ser desfeita.', 'Descartar', true).then(function (ok) {
           if (!ok) return;
           Object.keys(timers).forEach(function (k) { clearTimeout(timers[k]); });
-          TB.api('DELETE', '/workouts/' + w.id).then(function () { stopRest(); TB.toast('Treino descartado.'); TB.go('inicio'); }, TB.fail);
+          TB.api('DELETE', '/workouts/' + w.id).then(function () { TB.toast('Treino descartado.'); TB.go('inicio'); }, TB.fail);
         });
       });
       TB.on(root, 'click', '[data-finish]', function () {
@@ -333,7 +300,7 @@
             fields: '<p class="muted">Você registrou <strong style="color:var(--white)">' + total + ' de ' + planned + ' séries</strong> prescritas.' + (total < planned ? ' Dá para concluir mesmo assim.' : '') + '</p>' +
               '<label class="field"><span>Como foi o treino? (opcional)</span><textarea class="textarea" name="notes" maxlength="500" placeholder="Ex.: dormi mal, senti o ombro no supino..."></textarea></label>',
             onSubmit: function (data) { return TB.api('POST', '/workouts/' + w.id + '/finish', { notes: data.notes }); },
-            after: function () { stopRest(); TB.toast('Treino concluído e salvo.'); TB.go('historico/' + w.id); }
+            after: function () { TB.toast('Treino concluído e salvo.'); TB.go('historico/' + w.id); }
           });
         });
       });
@@ -369,8 +336,8 @@
   /* ---------- Perfil ---------- */
   TB.passwordCard = function () {
     return '<form class="card form" data-password novalidate><h2 class="h2">Alterar senha</h2>' +
-      '<label class="field"><span>Senha atual</span><input class="input" type="password" name="current" autocomplete="current-password" required></label>' +
-      '<label class="field"><span>Nova senha (mínimo 8 caracteres)</span><input class="input" type="password" name="password" autocomplete="new-password" minlength="8" required></label>' +
+      TB.passwordField('Senha atual', 'current', 'current-password', 'required') +
+      TB.passwordField('Nova senha (mínimo 8 caracteres)', 'password', 'new-password', 'minlength="8" required') +
       '<p class="form-error" hidden></p><button class="btn btn--ghost btn--sm" type="submit" style="justify-self:start">Salvar nova senha</button></form>';
   };
   TB.bindPassword = function (root) {

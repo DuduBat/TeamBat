@@ -55,19 +55,19 @@ test('2. treinador monta a ficha', async () => {
   ctx.puxada = lib.find((e) => e.name === 'Puxada alta na polia').id;
   let r = await admin('POST', `/api/admin/students/${ctx.ana}/days`, { label: 'A', name: 'Peito' });
   ctx.dayA = r.data.days[0].id;
-  r = await admin('POST', `/api/admin/days/${ctx.dayA}/exercises`, { exerciseId: ctx.supino, sets: 3, repsMin: 8, repsMax: 12, restSeconds: 90, notes: 'Controle a descida' });
-  r = await admin('POST', `/api/admin/days/${ctx.dayA}/exercises`, { exerciseId: ctx.puxada, sets: 2, repsMin: 10, repsMax: 12, restSeconds: 60, notes: '' });
+  r = await admin('POST', `/api/admin/days/${ctx.dayA}/exercises`, { exerciseId: ctx.supino, sets: 3, repsMin: 8, repsMax: 12, notes: 'Controle a descida' });
+  r = await admin('POST', `/api/admin/days/${ctx.dayA}/exercises`, { exerciseId: ctx.puxada, sets: 2, repsMin: 10, repsMax: 12, notes: '' });
   assert.equal(r.data.days[0].exercises.length, 2);
   const ids = r.data.days[0].exercises.map((e) => e.id).reverse();
   r = await admin('POST', `/api/admin/days/${ctx.dayA}/reorder`, { ids });
   assert.equal(r.data.days[0].exercises[0].exerciseId, ctx.puxada);
   r = await admin('POST', `/api/admin/days/${ctx.dayA}/reorder`, { ids: ids.reverse() });
   assert.equal(r.data.days[0].exercises[0].exerciseId, ctx.supino);
-  assert.equal((await admin('POST', `/api/admin/days/${ctx.dayA}/exercises`, { exerciseId: ctx.supino, sets: 3, repsMin: 12, repsMax: 8, restSeconds: 90 })).status, 400);
+  assert.equal((await admin('POST', `/api/admin/days/${ctx.dayA}/exercises`, { exerciseId: ctx.supino, sets: 3, repsMin: 12, repsMax: 8 })).status, 400);
   // ficha da Bia
   r = await admin('POST', `/api/admin/students/${ctx.bia}/days`, { label: 'A', name: 'Geral' });
   ctx.biaDay = r.data.days[0].id;
-  await admin('POST', `/api/admin/days/${ctx.biaDay}/exercises`, { exerciseId: ctx.supino, sets: 3, repsMin: 8, repsMax: 12, restSeconds: 90 });
+  await admin('POST', `/api/admin/days/${ctx.biaDay}/exercises`, { exerciseId: ctx.supino, sets: 3, repsMin: 8, repsMax: 12 });
 });
 
 test('3. aluno faz login e vê a própria ficha', async () => {
@@ -80,6 +80,7 @@ test('3. aluno faz login e vê a própria ficha', async () => {
   assert.equal(home.days.length, 1);
   assert.equal(home.days[0].exercises[0].name, 'Supino inclinado com halteres');
   assert.equal(home.days[0].exercises[0].notes, 'Controle a descida');
+  assert.equal('restSeconds' in home.days[0].exercises[0], false); // descanso removido do sistema
   assert.equal(home.nextDayId, ctx.dayA);
 });
 
@@ -136,7 +137,7 @@ test('7. treinador vê a progressão por exercício', async () => {
 test('editar a ficha não altera o histórico', async () => {
   const days = (await admin('GET', `/api/plan?student=${ctx.ana}`)).data.days;
   const item = days[0].exercises[0];
-  await admin('PUT', `/api/admin/day-exercises/${item.id}`, { sets: 5, repsMin: 5, repsMax: 6, restSeconds: 180, notes: 'novo' });
+  await admin('PUT', `/api/admin/day-exercises/${item.id}`, { sets: 5, repsMin: 5, repsMax: 6, notes: 'novo' });
   await admin('DELETE', `/api/admin/day-exercises/${days[0].exercises[1].id}`);
   const old = (await admin('GET', `/api/workouts/${ctx.w1}`)).data.workout;
   assert.equal(old.exercises.length, 2);
@@ -180,7 +181,7 @@ test('exercício cadastrado na montagem da ficha entra na biblioteca e na ficha 
   assert.equal(created.status, 200);
   const lib = (await admin('GET', '/api/exercises')).data.exercises;
   assert.ok(lib.some((e) => e.id === created.data.id && !e.archived && e.muscleGroup === 'Peito'));
-  const r = await admin('POST', `/api/admin/days/${ctx.biaDay}/exercises`, { exerciseId: created.data.id, sets: 3, repsMin: 8, repsMax: 12, restSeconds: 90, notes: '' });
+  const r = await admin('POST', `/api/admin/days/${ctx.biaDay}/exercises`, { exerciseId: created.data.id, sets: 3, repsMin: 8, repsMax: 12, notes: '' });
   assert.equal(r.status, 200);
   const plan = (await bia('GET', '/api/plan')).data.days[0];
   const item = plan.exercises.find((e) => e.exerciseId === created.data.id);
